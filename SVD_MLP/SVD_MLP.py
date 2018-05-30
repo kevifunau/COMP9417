@@ -91,22 +91,28 @@ user_input_mlp = tf.nn.embedding_lookup(user_embedding_mlp, user_id)
 item_input_mlp = tf.nn.embedding_lookup(item_embedding_mlp, item_id)
 
 # Here is the regularization term using l2_regularizer fot the user_input_mlp and item_input_mlp. We will include this term in the loss function for regularization.
-regularizer_1 = tf.contrib.layers.l2_regularizer(0.2)
+regularizer_1 = tf.contrib.layers.l2_regularizer(0.3)
 reg_term_1 = tf.contrib.layers.apply_regularization(regularizer_1,[user_input_mlp,item_input_mlp])
 
 # We multiply the user hidden layer with the item hidden layer to get their combination with shape [bath_size, embedding_size_mlp]
-fc_input = tf.multiply(user_input_mlp,item_input_mlp)
+fc_input = tf.concat([user_input_mlp,item_input_mlp],axis=1)
 
 # Then we put the combined vector into our fc layers, with an out put fc_output.
 # The shape of the fc_output is [batch_size, 1], which indicates the nonlinear connection between the item and the user.
-w_1 = tf.Variable(tf.truncated_normal([emdedding_size_mlp, 10], stddev=0.1))
-b_1 = tf.Variable(tf.constant(0., shape=[10]))
+w_1 = tf.Variable(tf.truncated_normal([2 * emdedding_size_mlp, 100], stddev=0.1))
+b_1 = tf.Variable(tf.constant(0., shape=[100]))
 l_1 = tf.nn.tanh(tf.nn.xw_plus_b(fc_input, w_1, b_1))
 l_1_drop = tf.nn.dropout(l_1, keep_prob)
 
-w_2 = tf.Variable(tf.truncated_normal([10, 1], stddev=0.1))
-b_2 = tf.Variable(tf.constant(0., shape=[1]))
-fc_output = tf.nn.xw_plus_b(l_1_drop,w_2,b_2)
+w_2 = tf.Variable(tf.truncated_normal([100, 20], stddev=0.1))
+b_2 = tf.Variable(tf.constant(0., shape=[20]))
+l_2 = tf.nn.tanh(tf.nn.xw_plus_b(l_1_drop, w_2, b_2))
+l_2_drop = tf.nn.dropout(l_2, keep_prob)
+
+
+w_4 = tf.Variable(tf.truncated_normal([20, 1], stddev=0.1))
+b_4 = tf.Variable(tf.constant(0., shape=[1]))
+fc_output = tf.nn.xw_plus_b(l_2_drop,w_4,b_4)
 
 
 #---------------------SVD Part-------------------#
@@ -136,7 +142,7 @@ reg_term_3 = tf.contrib.layers.apply_regularization(regularizer_l1,[user_bias,it
 svd_qp = tf.reduce_sum(tf.multiply(user_input_svd,item_input_svd), axis = 1, keep_dims = True)
 
 # We get both ouput of the mlp and svd layer, then combine then into a new vector with shape [batch_size, 2].
-prediction_mlp = tf.nn.xw_plus_b(l_1_drop, w_2, b_2)+ user_bias + item_bias + rate_average
+prediction_mlp = fc_output
 prediction_svd = svd_qp + user_bias + item_bias + rate_average
 combine_vec = tf.concat([prediction_mlp, prediction_svd],axis = 1)
 
