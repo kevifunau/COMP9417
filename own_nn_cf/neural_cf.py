@@ -4,13 +4,12 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
 
-
 emdedding_size = 10
 batch_size = 200
 
 
 header = ['user_id', 'item_id', 'rating', 'timestamp']
-df = pd.read_csv('u.data', sep='\t', names = header)
+df = pd.read_csv('ml-100k/u.data', sep='\t', names = header)
 n_users = df.user_id.unique().shape[0]
 n_items = df.item_id.unique().shape[0]
 
@@ -72,5 +71,3 @@ if __name__ == '__main__':
 
 
             print("loss: {:.3f}, rmse: {:.3f}".format(np.mean(train_loss), np.sqrt(np.mean(rmse))))
-
-

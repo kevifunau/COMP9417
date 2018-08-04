@@ -116,7 +116,7 @@ class SVD:
 
 if __name__ == '__main__':
     header = ['user_id', 'item_id', 'rating', 'timestamp']
-    df = pd.read_csv('u.data', sep='\t', names = header)
+    df = pd.read_csv('ml-100k/u.data', sep='\t', names = header)
 
     train_data, test_data = train_test_split(df, test_size = 0.1)
     SVD_model = SVD(train_data, test_data)

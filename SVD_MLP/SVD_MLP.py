@@ -171,7 +171,3 @@ if __name__ == '__main__':
                 rmse.append((pred - test_data[start:end,2].reshape(batch_size,1))**2)
 
             print("Train_rmse: {:.3f}, Test_rmse: {:.3f}".format(np.sqrt(np.mean(train_loss)), np.sqrt(np.mean(rmse))))
-
-
-
-

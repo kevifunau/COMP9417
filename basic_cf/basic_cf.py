@@ -28,7 +28,7 @@ def rmse(prediction, ground_truth):
 
 #read data
 header = ['user_id', 'item_id', 'rating', 'timestamp']
-df = pd.read_csv('u.data', sep='\t', names=header)
+df = pd.read_csv('ml-100k/u.data', sep='\t', names=header)
 
 #check data
 n_users = df.user_id.unique().shape[0]
@@ -53,4 +53,3 @@ user_prediction = predict(train_data_matrix, user_similarity, type='user')
 
 print('User-based CF RMSE: ' + str(rmse(user_prediction, test_data_matrix)))
 print('Item-based CF RMSE: ' + str(rmse(item_prediction, test_data_matrix)))
-
